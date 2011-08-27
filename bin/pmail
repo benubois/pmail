@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+# require 'pmail/cli'
+require 'optparse'
+
+options = {}
+
+optparse = OptionParser.new do |opts| 
+  
+  opts.on( '-s SUBJECT', "Specify subject on command line." ) do |arg|
+    options[:subject] = arg
+  end
+
+  opts.on('-h', '--help', 'Display help info') do                                                                                                                                                               
+    puts opts                                                                                                                                                                                                     
+    exit                                                                                                                                                                                                          
+  end
+end
+
+
+begin                                                                                                                                                                                                             
+  optparse.parse!                                                                                                                                                                                                 
+  mandatory = [:subject]
+  
+  missing = mandatory.select{ |param| options[param].nil? }
+  
+  puts missing.inspect
+  
+  if not missing.empty?
+    puts "Missing options: #{missing.join(', ')}"
+    puts optparse
+    exit
+  end
+rescue OptionParser::InvalidOption, OptionParser::MissingArgument
+  puts $!.to_s
+  puts optparse
+  exit
+end
+
+# Kernel.abort('test') if options[:subject].nil?
+
+# puts options.inspect
+# puts options.inspect
