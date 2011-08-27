@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# require 'pmail/cli'
+require 'pmail/message'
 require 'optparse'
 
 options = {}
@@ -19,12 +19,8 @@ end
 
 begin                                                                                                                                                                                                             
   optparse.parse!                                                                                                                                                                                                 
-  mandatory = [:subject]
-  
+  mandatory = []
   missing = mandatory.select{ |param| options[param].nil? }
-  
-  puts missing.inspect
-  
   if not missing.empty?
     puts "Missing options: #{missing.join(', ')}"
     puts optparse
@@ -36,7 +32,29 @@ rescue OptionParser::InvalidOption, OptionParser::MissingArgument
   exit
 end
 
+
+
+begin
+  
+  message = Pmail::Message.new
+  message.from         = "ben@benubois.com"
+  message.to           = "bb@flickerbox.com"
+  message.subject      = options[:subject]
+  message.body         = "Hello"
+  message.send  
+  
+rescue Postmark::InvalidMessageError
+  puts "Invalid message: " + $!.to_s
+  exit 1
+rescue Exception => e
+  puts e.to_s
+  exit 1
+end
+
+
+
 # Kernel.abort('test') if options[:subject].nil?
 
 # puts options.inspect
 # puts options.inspect
+
