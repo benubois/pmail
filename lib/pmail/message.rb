@@ -1,5 +1,6 @@
 require 'postmark'
 require 'mail'
+require 'yaml'
 
 module Pmail
   class Message
@@ -11,10 +12,14 @@ module Pmail
       @to      = ''
       @subject = ''
       @body    = ''
+      @config = YAML.load_file(ENV['HOME'] + '/.pmail')
+      
+      puts @config.inspect
     end
+    
     def send
       message = Mail.new
-      message.delivery_method(Mail::Postmark, :api_key => "f13c6cc7-4f17-4d8e-a473-4b3465b61f4a")
+      message.delivery_method(Mail::Postmark, :api_key => @config[:api_key])
      
       message.from         = @from
       message.to           = @to

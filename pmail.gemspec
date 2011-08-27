@@ -21,5 +21,6 @@ Gem::Specification.new do |s|
   s.add_dependency "postmark"
   s.add_dependency "mail"
   s.add_dependency "json"
+  # s.add_dependency "yaml"
   
 end
