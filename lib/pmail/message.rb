@@ -5,40 +5,40 @@ require 'yaml'
 module Pmail
   class Message
     
-    attr_accessor :from, :to, :subject, :body
+    attr_writer :from, :to, :subject, :body, :api_key
     
     def initialize
       @from    = ''
       @to      = ''
       @subject = ''
       @body    = ''
-      @config = YAML.load_file(ENV['HOME'] + '/.pmail')
-      
-      puts @config.inspect
+      @api_key = ''
     end
     
     def send
+      
       message = Mail.new
-      message.delivery_method(Mail::Postmark, :api_key => @config[:api_key])
-     
+      message.delivery_method(Mail::Postmark, :api_key => @api_key)
+           
       message.from         = @from
       message.to           = @to
       message.subject      = @subject
       message.body         = @body
-      message.content_type = "text/html"
+      
+      # TODO make this user configurable
+      message.content_type = "text/plain"
 
-      # # You can set customer headers if you like:
-      # message["CUSTOM-HEADER"] = "my custom header value"
-      # 
-      # # Added a tag:
-      # message.tag = "my-tracking-tag"
-      # 
-      # # Add attachments:
-      # message.postmark_attachments = [File.open("/path"), File.open("/path")]
-      # 
-      # # Or specify a reply-to address (can also be an array of addresses):
-      # message.reply_to = "penny@bigbangtheory.com"
-     
+      # TODO add custom header support
+      # message["CUSTOM-HEADER"] = "header"
+      
+      # TODO add tag support
+      # message.tag = "tag"
+      
+      # TODO add attachment support
+      # message.postmark_attachments = [File.open("/path")]
+      
+      # TODO add reply-to support
+      # message.reply_to = "reply to"
      
       message.deliver
     end    

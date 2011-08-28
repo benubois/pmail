@@ -1,13 +1,29 @@
 #!/usr/bin/env ruby
-require 'pmail/message'
+require 'pmail'
 require 'optparse'
 
-options = {}
+config  = Pmail::Config.new
+
+options = {
+  :body => STDIN.read
+}
 
 optparse = OptionParser.new do |opts| 
   
-  opts.on( '-s SUBJECT', "Specify subject on command line." ) do |arg|
+  opts.on( '-f FROM', "From address. Must be a valid Postmark signature." ) do |arg|
+    options[:from] = arg
+  end
+
+  opts.on( '-t TO', "To address." ) do |arg|
+    options[:to] = arg
+  end
+
+  opts.on( '-s SUBJECT', "Subject" ) do |arg|
     options[:subject] = arg
+  end
+
+  opts.on( '-b BODY', "Specify body on on the command line." ) do |arg|
+    options[:body] = arg
   end
 
   opts.on('-h', '--help', 'Display help info') do                                                                                                                                                               
@@ -17,9 +33,14 @@ optparse = OptionParser.new do |opts|
 end
 
 
-begin                                                                                                                                                                                                             
-  optparse.parse!                                                                                                                                                                                                 
-  mandatory = []
+begin
+  optparse.parse!                                                                                                                                                                                            
+  
+  options = config.settings.merge(options)
+  
+  puts options.inspect
+                                                                                                                                                                                                          
+  mandatory = [:from, :to, :body, :api_key]
   missing = mandatory.select{ |param| options[param].nil? }
   if not missing.empty?
     puts "Missing options: #{missing.join(', ')}"
@@ -37,10 +58,11 @@ end
 begin
   
   message = Pmail::Message.new
-  message.from         = "ben@benubois.com"
-  message.to           = "bb@flickerbox.com"
-  message.subject      = options[:subject]
-  message.body         = "Hello"
+  message.api_key = options[:api_key]
+  message.from    = options[:from]
+  message.to      = options[:to]
+  message.subject = options[:subject]
+  message.body    = options[:body]
   message.send  
   
 rescue Postmark::InvalidMessageError
