@@ -41,9 +41,6 @@ end
 begin
   optparse.parse!
   options = config.settings.merge(options)
-  
-  puts options.inspect
-  
   mandatory = [:from, :to, :body, :api_key]
   missing = mandatory.select{ |param| options[param].nil? }
   if not missing.empty?
