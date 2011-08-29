@@ -1,5 +1,6 @@
 require 'fileutils'
 module Pmail
+  
   class Config
     
     include FileUtils
@@ -17,5 +18,5 @@ module Pmail
     end
 
   end
-  
+
 end

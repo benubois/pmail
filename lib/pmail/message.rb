@@ -5,14 +5,13 @@ require 'yaml'
 module Pmail
   class Message
     
-    attr_writer :from, :to, :subject, :body, :api_key
-    
-    def initialize
-      @from    = ''
-      @to      = ''
-      @subject = ''
-      @body    = ''
-      @api_key = ''
+    def initialize(options = {})      
+      @from    = options[:from]
+      @to      = options[:to]
+      @subject = options[:subject]
+      @body    = options[:body]
+      @api_key = options[:api_key]
+      @format  = options[:format]
     end
     
     def send
@@ -26,7 +25,7 @@ module Pmail
       message.body         = @body
       
       # TODO make this user configurable
-      message.content_type = "text/plain"
+      message.content_type = "text/#{@format}"
 
       # TODO add custom header support
       # message["CUSTOM-HEADER"] = "header"

@@ -1,29 +1,35 @@
 #!/usr/bin/env ruby
 require 'pmail'
 require 'optparse'
+require 'fcntl'
 
 config  = Pmail::Config.new
 
 options = {
-  :body => STDIN.read
+  :body   => (STDIN.fcntl(Fcntl::F_GETFL, 0) == 0) ? STDIN.read : '',
+  :format => :plain
 }
 
 optparse = OptionParser.new do |opts| 
   
-  opts.on( '-f FROM', "From address. Must be a valid Postmark signature." ) do |arg|
+  opts.on( '-f', '--from from', "From address. Must be a valid Postmark signature." ) do |arg|
     options[:from] = arg
   end
 
-  opts.on( '-t TO', "To address." ) do |arg|
+  opts.on( '-t', '--to a,b,c', Array, "To address. For multiple, use comma separated addresses." ) do |arg|
     options[:to] = arg
   end
 
-  opts.on( '-s SUBJECT', "Subject" ) do |arg|
+  opts.on( '-s', '--subject subject', "The emails subject." ) do |arg|
     options[:subject] = arg
   end
+  
+  opts.on( '-k', '--key api_key', "Your Postmark API key." ) do |arg|
+    options[:api_key]
+  end
 
-  opts.on( '-b BODY', "Specify body on on the command line." ) do |arg|
-    options[:body] = arg
+  opts.on('--format format', [:plain, :html], "Mail message format." ) do |arg|
+    options[:format] = arg.to_s
   end
 
   opts.on('-h', '--help', 'Display help info') do                                                                                                                                                               
@@ -32,14 +38,12 @@ optparse = OptionParser.new do |opts|
   end
 end
 
-
 begin
-  optparse.parse!                                                                                                                                                                                            
-  
+  optparse.parse!
   options = config.settings.merge(options)
   
   puts options.inspect
-                                                                                                                                                                                                          
+  
   mandatory = [:from, :to, :body, :api_key]
   missing = mandatory.select{ |param| options[param].nil? }
   if not missing.empty?
@@ -53,18 +57,9 @@ rescue OptionParser::InvalidOption, OptionParser::MissingArgument
   exit
 end
 
-
-
 begin
-  
-  message = Pmail::Message.new
-  message.api_key = options[:api_key]
-  message.from    = options[:from]
-  message.to      = options[:to]
-  message.subject = options[:subject]
-  message.body    = options[:body]
+  message = Pmail::Message.new(options)
   message.send  
-  
 rescue Postmark::InvalidMessageError
   puts "Invalid message: " + $!.to_s
   exit 1
@@ -72,11 +67,3 @@ rescue Exception => e
   puts e.to_s
   exit 1
 end
-
-
-
-# Kernel.abort('test') if options[:subject].nil?
-
-# puts options.inspect
-# puts options.inspect
-
