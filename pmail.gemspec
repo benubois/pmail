@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Ben Ubois"]
   s.email       = ["ben@benubois.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Command-line Postmark}
+  s.description = %q{Send mail using the Postmark API from the command line.}
 
   s.rubyforge_project = "pmail"
 
