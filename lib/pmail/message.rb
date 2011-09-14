@@ -23,8 +23,6 @@ module Pmail
       message.to           = @to
       message.subject      = @subject
       message.body         = @body
-      
-      # TODO make this user configurable
       message.content_type = "text/#{@format}"
 
       # TODO add custom header support
